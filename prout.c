@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/08/14 19:10:48 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/08/19 16:56:04 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	parsing(int ac, char **av)
 		if (ft_atoi(av[i]) > 0)
 			i++;
 		else
-			return (printf("[%s]\n", av[i]), -1);
+			return (-1);
 	}
 	return (0);
 }
