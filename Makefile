@@ -6,35 +6,44 @@
 #    By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 13:40:23 by idakhlao          #+#    #+#              #
-#    Updated: 2024/11/15 17:14:52 by idakhlao         ###   ########.fr        #
+#    Updated: 2024/11/15 18:10:46 by idakhlao         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-SRCS = prout.c utils.c
-OBJS = ${SRCS:.c=.o}
-CFLAGS = -Wall -Wextra -Werror -g3 
+SRCS = 	src/prout.c \
+		src/utils/utils.c
+	
+OBJS_DIR = .objects
+OBJS = $(addprefix $(OBJS_DIR)/, $(SRCS:.c=.o))
+
+CFLAGS = -Wall -Wextra -Werror -g3 -pthread
 CC = cc
 RM = rm -f
 
-all : $(NAME) 
+$(OBJS_DIR):
+	mkdir -p $(OBJS_DIR) $(OBJS_DIR)/src $(OBJS_DIR)/src/utils
 
-.c.o:
-	cc $(CFLAGS) -c -o $@ $< 
+all: $(NAME)
+
+$(OBJS_DIR)/%.o: %.c | $(OBJS_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-clean :
-	${RM} ${OBJS}
+clean:
+	$(RM) $(OBJS)
+	find $(OBJS_DIR) -type f -name "*.o" -delete
 
-fclean : clean
-	${RM} ${NAME}
+fclean: clean
+	$(RM) $(NAME)
 
-ac : all clean
+
+ac: all clean
 	make clean
 
-re : fclean all
+re: fclean all
 
-.PHONY = make clean fclean re
+.PHONY: all clean fclean re

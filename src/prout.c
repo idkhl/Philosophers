@@ -6,11 +6,11 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/08/19 16:56:04 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/15 18:10:18 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "../includes/philo.h"
 
 void	init_structure(char **av, t_data *philo)
 {
@@ -22,16 +22,27 @@ void	init_structure(char **av, t_data *philo)
 		philo->nb_eat = ft_atoi(av[5]);
 }
 
-void	init_thread(void)
+void	*test()
 {
-	pthread_create();
+	printf("TESTTESTEST\n");
+	return (NULL);
+}
+
+void	init_thread()
+{
+	pthread_t thread1, thread2;
+
+	pthread_create(&thread1, NULL, &test, NULL);
+	pthread_create(&thread2, NULL, &test, NULL);
+	pthread_join(thread1, NULL);
+	pthread_join(thread2, NULL);
 }
 
 int	parsing(int ac, char **av)
 {
 	int	i;
 
-	if (ac != 6 || ac != 5)
+	if (ac < 5 || ac > 6)
 		return (-1);
 	i = 1;
 	while (av[i])
@@ -47,9 +58,11 @@ int	parsing(int ac, char **av)
 int	main(int ac, char **av)
 {
 	t_data	philo;
+	// pthread_t thread1, thread2;
 
 	if (parsing(ac, av) == -1)
 		return (printf("Error\n"), 0);
 	init_structure(av, &philo);
 	init_thread();
+	return (0);
 }

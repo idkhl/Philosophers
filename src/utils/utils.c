@@ -6,11 +6,11 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/08/14 16:22:27 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/15 18:09:41 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "../../includes/philo.h"
 
 int	ft_atoi(const char *str)
 {
