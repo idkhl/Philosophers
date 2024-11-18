@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/15 18:10:18 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/18 17:30:21 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,56 @@ void	init_structure(char **av, t_data *philo)
 		philo->nb_eat = ft_atoi(av[5]);
 }
 
-void	*test()
+void	*test(void *arg)
 {
-	printf("TESTTESTEST\n");
+	t_thread	*data;
+	struct timeval	tv;
+
+	data = (t_thread *)arg;
+	gettimeofday(&tv, NULL);
+	printf("[%ld] Philosopher %d started eating\n", tv.tv_usec, data->index + 1);
+	usleep(data->philo->eat);
+	printf("[%ld] Philosopher %d finished eating\n", tv.tv_usec, data->index + 1);
 	return (NULL);
 }
 
-void	init_thread()
+int	init_thread(t_data *philo)
 {
-	pthread_t thread1, thread2;
+	pthread_t	*thread;
+	t_thread	*args;
+	int			i;
 
-	pthread_create(&thread1, NULL, &test, NULL);
-	pthread_create(&thread2, NULL, &test, NULL);
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
+	thread = malloc(sizeof(pthread_t) * philo->nb_philo);
+	args = malloc(sizeof(t_thread) * philo->nb_philo);
+	if (!thread || !args)
+		return (1);
+	i = 0;
+	while (i < philo->nb_philo)
+	{
+		args[i].philo = philo;
+		args[i].index = i;
+		if (pthread_create(&thread[i], NULL, &test, &args[i]) != 0)
+		{
+			free(thread);
+			free(args);
+			return (1);
+		}
+		i++;
+	}
+	i = 0;
+	while (i < philo->nb_philo)
+	{
+		if (pthread_join(thread[i], NULL))
+		{
+			free(thread);
+			free(args);
+			return (1);
+		}
+		i++;
+	}
+	free(thread);
+	free(args);
+	return (0);
 }
 
 int	parsing(int ac, char **av)
@@ -58,11 +94,10 @@ int	parsing(int ac, char **av)
 int	main(int ac, char **av)
 {
 	t_data	philo;
-	// pthread_t thread1, thread2;
 
 	if (parsing(ac, av) == -1)
 		return (printf("Error\n"), 0);
 	init_structure(av, &philo);
-	init_thread();
+	init_thread(&philo);
 	return (0);
 }

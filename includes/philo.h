@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:33 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/08/14 19:00:42 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/18 17:15:15 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <pthread.h>
+# include <sys/time.h>
 
 typedef struct s_data
 {
@@ -27,6 +28,12 @@ typedef struct s_data
 	int	sleep;
 	int	nb_eat;
 }	t_data;
+
+typedef struct s_thread
+{
+	t_data	*philo;
+	int		index;
+}	t_thread;
 
 int	ft_atoi(const char *str);
 
