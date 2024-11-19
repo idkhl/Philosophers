@@ -6,72 +6,118 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/18 17:30:21 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/19 19:12:45 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void	init_structure(char **av, t_data *philo)
+long int	get_time(void)
 {
-	philo->nb_philo = ft_atoi(av[1]);
-	philo->die = ft_atoi(av[2]);
-	philo->eat = ft_atoi(av[3]);
-	philo->sleep = ft_atoi(av[4]);
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+}
+
+void	init_structure(char **av, t_data *data)
+{
+	data->nb_philo = ft_atoi(av[1]);
+	data->die = ft_atoi(av[2]);
+	data->eat = ft_atoi(av[3]);
+	data->sleep = ft_atoi(av[4]);
 	if (av[5])
-		philo->nb_eat = ft_atoi(av[5]);
+		data->nb_eat = ft_atoi(av[5]);
+	else
+		data->nb_eat = -1;
+	data->start = get_time();
+}
+
+void	check_death(t_philo *philo)
+{
+	long current_time;
+
+	current_time = get_time() - philo->data->start;
+	if (current_time - philo->last_ate > philo->data->die)
+	{
+		current_time = get_time() - philo->data->start;
+		printf("%ld %d died\n", current_time, philo->index + 1);
+		exit(0);
+	}
 }
 
 void	*test(void *arg)
 {
-	t_thread	*data;
-	struct timeval	tv;
+	t_philo		*philo;
+	long		current_time;
 
-	data = (t_thread *)arg;
-	gettimeofday(&tv, NULL);
-	printf("[%ld] Philosopher %d started eating\n", tv.tv_usec, data->index + 1);
-	usleep(data->philo->eat);
-	printf("[%ld] Philosopher %d finished eating\n", tv.tv_usec, data->index + 1);
+	philo = (t_philo *)arg;
+	if (philo->index % 2 != 0)
+		usleep(100);
+	current_time = get_time() - philo->data->start;
+	while (1)
+	{
+		check_death(philo);
+		if (philo->index % 2 == 0)
+		{
+			pthread_mutex_lock(&philo->mutex[philo->index]);
+			pthread_mutex_lock(&philo->mutex[(philo->index + 1) % philo->data->nb_philo]);
+		}
+		else
+		{
+			pthread_mutex_lock(&philo->mutex[(philo->index + 1) % philo->data->nb_philo]);
+			pthread_mutex_lock(&philo->mutex[philo->index]);
+		}
+		current_time = get_time() - philo->data->start;
+		printf("%ld %d is eating\n", current_time, philo->index + 1);
+		usleep(philo->data->eat * 1000);
+		philo->last_ate = get_time();
+		pthread_mutex_unlock(&philo->mutex[philo->index]);
+		pthread_mutex_unlock(&philo->mutex[(philo->index + 1) % philo->data->nb_philo]);
+		check_death(philo);
+		current_time = get_time() - philo->data->start;
+		printf("%ld %d is sleeping\n", current_time, philo->index + 1);
+		usleep(philo->data->sleep * 1000);
+		check_death(philo);
+		current_time = get_time() - philo->data->start;
+		printf("%ld %d is thinking\n", current_time, philo->index + 1);
+	}
 	return (NULL);
 }
 
-int	init_thread(t_data *philo)
+int	init_thread(t_data *data)
 {
-	pthread_t	*thread;
-	t_thread	*args;
-	int			i;
+	pthread_t		*thread;
+	pthread_mutex_t	*mutex;
+	t_philo			*args;
+	int				i;
 
-	thread = malloc(sizeof(pthread_t) * philo->nb_philo);
-	args = malloc(sizeof(t_thread) * philo->nb_philo);
-	if (!thread || !args)
+	thread = malloc(sizeof(pthread_t) * data->nb_philo);
+	mutex = malloc(sizeof(pthread_mutex_t) * data->nb_philo);
+	args = malloc(sizeof(t_philo) * data->nb_philo);
+	if (!thread || !args || !mutex)
 		return (1);
 	i = 0;
-	while (i < philo->nb_philo)
+	while (i < data->nb_philo)
 	{
-		args[i].philo = philo;
+		pthread_mutex_init(&mutex[i], NULL);
+		args[i].data = data;
 		args[i].index = i;
+		args[i].mutex = mutex;
+		args[i].ate = 0;
+		args[i].last_ate = 0;
 		if (pthread_create(&thread[i], NULL, &test, &args[i]) != 0)
-		{
-			free(thread);
-			free(args);
-			return (1);
-		}
+			return (free(thread), free(mutex), free(args), 1);
 		i++;
 	}
 	i = 0;
-	while (i < philo->nb_philo)
+	while (i < data->nb_philo)
 	{
-		if (pthread_join(thread[i], NULL))
-		{
-			free(thread);
-			free(args);
-			return (1);
-		}
+		pthread_join(thread[i], NULL);
+		pthread_mutex_destroy(&mutex[i]);
 		i++;
 	}
-	free(thread);
-	free(args);
-	return (0);
+	return (free(thread), free(mutex), free(args), 0);
 }
 
 int	parsing(int ac, char **av)

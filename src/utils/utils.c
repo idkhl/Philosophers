@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/15 18:09:41 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/19 14:40:13 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,3 +41,12 @@ int	ft_atoi(const char *str)
 	}
 	return (nb * neg);
 }
+
+// long int	get_time(void)
+// {
+// 	struct timeval	tv;
+
+// 	gettimeofday(&tv, NULL);
+// 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+// }
+
