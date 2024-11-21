@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/20 16:46:32 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/21 18:25:17 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,14 @@ void	init_structure(char **av, t_data *data)
 	else
 		data->nb_eat = -1;
 	data->start = get_time();
+	pthread_mutex_init(&data->print_mutex, NULL);
+}
+
+void	print_status(t_data *data, long time, int philo_id, char *status)
+{
+	pthread_mutex_lock(&data->print_mutex);
+	printf("%ld %d %s\n", time, philo_id, status);
+	pthread_mutex_unlock(&data->print_mutex);
 }
 
 int	check_death(t_philo *philo)
@@ -40,18 +48,18 @@ int	check_death(t_philo *philo)
 	current_time = get_time() - philo->data->start;
 	if (current_time > philo->data->die)
 	{
-		printf("%ld %d died\n", current_time, philo->index + 1);
+		print_status(philo->data, current_time, philo->index + 1, "died");
 		return (-1);
 	}
 	if (current_time - philo->last_ate > philo->data->die)
 	{
-		printf("%ld %d died\n", current_time, philo->index + 1);
+		print_status(philo->data, current_time, philo->index + 1, "died");
 		return (-1);
 	}
 	return (0);
 }
 
-void	*test(void *arg)
+void	*routine(void *arg)
 {
 	t_philo		*philo;
 	long		current_time;
@@ -66,30 +74,31 @@ void	*test(void *arg)
 			return (NULL);
 		if (philo->index % 2 == 0)
 		{
-			pthread_mutex_lock(&philo->mutex[philo->index]);
-			pthread_mutex_lock(&philo->mutex[(philo->index + 1) % philo->data->nb_philo]);
+			pthread_mutex_lock(&philo->forks[philo->index]);
+			pthread_mutex_lock(&philo->forks[(philo->index + 1) % philo->data->nb_philo]);
 		}
 		else
 		{
-			pthread_mutex_lock(&philo->mutex[(philo->index + 1) % philo->data->nb_philo]);
-			pthread_mutex_lock(&philo->mutex[philo->index]);
+			usleep(50);
+			pthread_mutex_lock(&philo->forks[(philo->index + 1) % philo->data->nb_philo]);
+			pthread_mutex_lock(&philo->forks[philo->index]);
 		}
 		current_time = get_time() - philo->data->start;
-		printf("%ld %d is eating\n", current_time, philo->index + 1);
+		print_status(philo->data, current_time, philo->index + 1, "is eating");
 		philo->ate++;
 		usleep(philo->data->eat * 1000);
 		philo->last_ate = get_time();
-		pthread_mutex_unlock(&philo->mutex[philo->index]);
-		pthread_mutex_unlock(&philo->mutex[(philo->index + 1) % philo->data->nb_philo]);
+		pthread_mutex_unlock(&philo->forks[philo->index]);
+		pthread_mutex_unlock(&philo->forks[(philo->index + 1) % philo->data->nb_philo]);
 		if (check_death(philo) == -1)
 			return (NULL);
 		current_time = get_time() - philo->data->start;
-		printf("%ld %d is sleeping\n", current_time, philo->index + 1);
+		print_status(philo->data, current_time, philo->index, "is sleeping");
 		usleep(philo->data->sleep * 1000);
 		if (check_death(philo) == -1)
 			return (NULL);
 		current_time = get_time() - philo->data->start;
-		printf("%ld %d is thinking\n", current_time, philo->index + 1);
+		print_status(philo->data, current_time, philo->index, "is thinking");
 	}
 	return (NULL);
 }
@@ -112,10 +121,10 @@ int	init_thread(t_data *data)
 		pthread_mutex_init(&mutex[i], NULL);
 		philo[i].data = data;
 		philo[i].index = i;
-		philo[i].mutex = mutex;
+		philo[i].forks = mutex;
 		philo[i].ate = 0;
 		philo[i].last_ate = 0;
-		if (pthread_create(&thread[i], NULL, &test, &philo[i]) != 0)
+		if (pthread_create(&thread[i], NULL, &routine, &philo[i]) != 0)
 			return (free(thread), free(mutex), free(philo), 1);
 		i++;
 	}
@@ -124,6 +133,7 @@ int	init_thread(t_data *data)
 	{
 		pthread_join(thread[i], NULL);
 		pthread_mutex_destroy(&mutex[i]);
+		// pthread_mutex_destroy(&data->print_mutex);
 		i++;
 	}
 	return (free(thread), free(mutex), free(philo), 0);
