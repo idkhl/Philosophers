@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/21 18:25:17 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/21 18:41:07 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,16 +72,21 @@ void	*routine(void *arg)
 	{
 		if (check_death(philo) == -1)
 			return (NULL);
-		if (philo->index % 2 == 0)
+		if (philo->index < (philo->index + 1) % philo->data->nb_philo)
 		{
 			pthread_mutex_lock(&philo->forks[philo->index]);
 			pthread_mutex_lock(&philo->forks[(philo->index + 1) % philo->data->nb_philo]);
 		}
 		else
 		{
-			usleep(50);
 			pthread_mutex_lock(&philo->forks[(philo->index + 1) % philo->data->nb_philo]);
 			pthread_mutex_lock(&philo->forks[philo->index]);
+		}
+		if (check_death(philo) == -1)
+		{
+			pthread_mutex_unlock(&philo->forks[philo->index]);
+			pthread_mutex_unlock(&philo->forks[(philo->index + 1) % philo->data->nb_philo]);
+			return NULL;
 		}
 		current_time = get_time() - philo->data->start;
 		print_status(philo->data, current_time, philo->index + 1, "is eating");
@@ -133,9 +138,9 @@ int	init_thread(t_data *data)
 	{
 		pthread_join(thread[i], NULL);
 		pthread_mutex_destroy(&mutex[i]);
-		// pthread_mutex_destroy(&data->print_mutex);
 		i++;
 	}
+	pthread_mutex_destroy(&data->print_mutex);
 	return (free(thread), free(mutex), free(philo), 0);
 }
 
