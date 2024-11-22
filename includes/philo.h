@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:33 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/21 17:58:23 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/22 18:54:19 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,11 @@ typedef struct s_data
 	int				eat;
 	int				sleep;
 	int				nb_eat;
+	int				is_alive;
 	long int		start;
 	pthread_mutex_t	print_mutex;
+	pthread_mutex_t mutex_alive;
+	pthread_mutex_t	*forks;
 }	t_data;
 
 typedef struct s_philo
@@ -36,7 +39,7 @@ typedef struct s_philo
 	int				index;
 	int				ate;
 	long int		last_ate;
-	pthread_mutex_t	*forks;
+	pthread_mutex_t	mutex;
 	t_data			*data;
 }	t_philo;
 
