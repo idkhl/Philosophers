@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/22 19:16:54 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:58:52 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ int	check_death(t_philo *philo)
 	current_time = get_time() - philo->data->start;
 	if (current_time - philo->last_ate > philo->data->die)
 	{
-		print_status(philo->data, current_time, philo->index + 1, "died");
 		pthread_mutex_lock(&philo->data->mutex_alive);
 		philo->data->is_alive = 0;
 		pthread_mutex_unlock(&philo->data->mutex_alive);
+		print_status(philo->data, current_time, philo->index + 1, "died");
 		return (-1);
 	}
 	return (0);
@@ -92,15 +92,17 @@ void	take_forks(t_philo *philo)
 	if (philo->index % 2 == 0)
 	{
 		pthread_mutex_lock(&philo->data->forks[left_fork]);
+		print_status(philo->data, current_time, philo->index + 1, "has taken a fork");
 		pthread_mutex_lock(&philo->data->forks[right_fork]);
+		print_status(philo->data, current_time, philo->index + 1, "has taken a fork");
 	}
 	else
 	{
 		pthread_mutex_lock(&philo->data->forks[right_fork]);
+		print_status(philo->data, current_time, philo->index + 1, "has taken a fork");
 		pthread_mutex_lock(&philo->data->forks[left_fork]);
+		print_status(philo->data, current_time, philo->index + 1, "has taken a fork");
 	}
-	print_status(philo->data, current_time, philo->index + 1, "has taken a fork");
-	print_status(philo->data, current_time, philo->index + 1, "has taken a fork");
 }
 
 void	release_forks(t_philo *philo)
@@ -131,6 +133,11 @@ void	*routine(void *arg)
 		if (check_death(philo) == -1)
 			break ;
 		take_forks(philo);
+		if (check_death(philo) == -1)
+		{
+			release_forks(philo);
+			break ;
+		}
 		print_status(philo->data, current_time, philo->index + 1, "is eating");
 		usleep(philo->data->eat * 1000);
 		pthread_mutex_lock(&philo->mutex);
@@ -169,6 +176,7 @@ int	init_thread(t_data *data)
 		pthread_mutex_init(&philo[i].mutex, NULL);
 		if (pthread_create(&thread[i], NULL, &routine, &philo[i]) != 0)
 		{
+			printf("Error: pthread_create failed\n");
 			while (--i >= 0)
 				pthread_join(thread[i], NULL);
 			return (free(thread), free(philo), 1);
