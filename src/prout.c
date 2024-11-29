@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/25 19:58:52 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/11/29 16:49:37 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,18 @@ void	print_status(t_data *data, long time, int philo_id, char *status)
 	pthread_mutex_lock(&data->print_mutex);
 	printf("%ld %d %s\n", time, philo_id, status);
 	pthread_mutex_unlock(&data->print_mutex);
+}
+
+void	precise_sleep(long sleep_duration)
+{
+	long	start_time = get_time();
+	long	elapsed_time = 0;
+
+	while (elapsed_time < sleep_duration)
+	{
+		usleep(100);
+		elapsed_time = get_time() - start_time;
+	}
 }
 
 int	check_death(t_philo *philo)
@@ -139,6 +151,7 @@ void	*routine(void *arg)
 			break ;
 		}
 		print_status(philo->data, current_time, philo->index + 1, "is eating");
+		// precise_sleep(philo->data->eat * 1000);
 		usleep(philo->data->eat * 1000);
 		pthread_mutex_lock(&philo->mutex);
 		philo->ate++;
@@ -149,6 +162,7 @@ void	*routine(void *arg)
 			break ;
 		current_time = get_time() - philo->data->start;
 		print_status(philo->data, current_time, philo->index + 1, "is sleeping");
+		// precise_sleep(philo->data->sleep * 1000);
 		usleep(philo->data->sleep * 1000);
 		current_time = get_time() - philo->data->start;
 		print_status(philo->data, current_time, philo->index + 1, "is thinking");
