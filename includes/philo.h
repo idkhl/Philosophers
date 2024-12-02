@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:33 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/11/22 18:54:19 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/02 16:26:55 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,5 +47,6 @@ typedef struct s_philo
 
 int			ft_atoi(const char *str);
 long int	get_time(void);
+int			ft_strcmp(char *s1, char *s2);
 
 #endif
