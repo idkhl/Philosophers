@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:33 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/02 16:26:55 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/03 17:55:57 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ typedef struct s_data
 	int				is_alive;
 	long int		start;
 	pthread_mutex_t	print_mutex;
-	pthread_mutex_t mutex_alive;
+	pthread_mutex_t	mutex_alive;
 	pthread_mutex_t	*forks;
 }	t_data;
 

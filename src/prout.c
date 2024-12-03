@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/02 17:41:56 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/03 17:58:00 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,6 @@ int	check_death(t_philo *philo)
 	}
 	pthread_mutex_unlock(&philo->data->mutex_alive);
 	current_time = get_time() - philo->data->start;
-	// printf("%ld %d: ate at %ld / %ld ms ago\n", current_time, philo->index + 1,philo->last_ate, current_time - philo->last_ate);
-	// printf("alive %d\n", philo->data->is_alive);
 	if (current_time - philo->last_ate > philo->data->die)
 	{
 		pthread_mutex_lock(&philo->data->mutex_alive);
@@ -88,18 +86,16 @@ int	check_death(t_philo *philo)
 void	precise_sleep(long sleep_duration, t_philo *philo)
 {
 	long	start_time;
-	long	elapsed_time;
 
 	start_time = get_time();
-	elapsed_time = 0;
-	while (elapsed_time < sleep_duration)
+	while ((get_time() - start_time) * 1000 < sleep_duration)
 	{
 		if (check_death(philo) == -1)
 			break ;
 		usleep(500);
-		elapsed_time = get_time() - start_time;
 	}
 }
+
 
 void	take_forks(t_philo *philo)
 {
@@ -108,7 +104,6 @@ void	take_forks(t_philo *philo)
 
 	left_fork = philo->index;
 	right_fork = (philo->index + 1) % philo->data->nb_philo;
-	// printf("rf: %d philo: %d\n", right_fork, philo->index);
 	if (philo->index % 2 == 0)
 	{
 		pthread_mutex_lock(&philo->data->forks[left_fork]);
@@ -149,14 +144,14 @@ void	*routine(void *arg)
 		if (check_death(philo) == -1)
 		{
 			print_status(philo, philo->index + 1, "died");
-			break ;
+			return (NULL);
 		}
 		take_forks(philo);
 		if (check_death(philo) == -1)
 		{
 			release_forks(philo);
 			print_status(philo, philo->index + 1, "died");
-			break ;
+			return (NULL);
 		}
 		print_status(philo, philo->index + 1, "is eating");
 		precise_sleep(philo->data->eat * 1000, philo);
@@ -168,16 +163,15 @@ void	*routine(void *arg)
 		if (philo->data->nb_eat != -1 && philo->ate >= philo->data->nb_eat)
 		{
 			print_status(philo, philo->index + 1, "is thinking");
-			break ;
+			return (NULL);
 		}
 		if (check_death(philo) == -1)
 		{
 			print_status(philo, philo->index + 1, "died");
-			break ;
+			return (NULL);
 		}
 		print_status(philo, philo->index + 1, "is sleeping");
 		precise_sleep(philo->data->sleep * 1000, philo);
-		print_status(philo, philo->index + 1, "is thinking");
 	}
 	return (NULL);
 }
