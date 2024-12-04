@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/03 17:58:00 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/04 16:03:44 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,6 @@ void	init_structure(char **av, t_data *data)
 	}
 }
 
-void	print_status(t_philo *philo, int philo_id, char *status)
-{
-	long	time;
-
-	time = get_time() - philo->data->start;
-	pthread_mutex_lock(&philo->data->print_mutex);
-	printf("%ld %d %s\n", time, philo_id, status);
-	pthread_mutex_unlock(&philo->data->print_mutex);
-}
 
 int	check_death(t_philo *philo)
 {
@@ -76,11 +67,21 @@ int	check_death(t_philo *philo)
 	{
 		pthread_mutex_lock(&philo->data->mutex_alive);
 		philo->data->is_alive = 0;
+		printf("%ld %d died\n", current_time, philo->index + 1);
 		pthread_mutex_unlock(&philo->data->mutex_alive);
-		print_status(philo, philo->index + 1, "died");
 		return (-1);
 	}
 	return (0);
+}
+void	print_status(t_philo *philo, int philo_id, char *status)
+{
+	long	time;
+
+	time = get_time() - philo->data->start;
+	pthread_mutex_lock(&philo->data->print_mutex);
+	if (check_death(philo) == 0)
+		printf("%ld %d %s\n", time, philo_id, status);
+	pthread_mutex_unlock(&philo->data->print_mutex);
 }
 
 void	precise_sleep(long sleep_duration, t_philo *philo)
@@ -90,6 +91,8 @@ void	precise_sleep(long sleep_duration, t_philo *philo)
 	start_time = get_time();
 	while ((get_time() - start_time) * 1000 < sleep_duration)
 	{
+		if (philo->data->is_alive == 0)
+			break ;
 		if (check_death(philo) == -1)
 			break ;
 		usleep(500);
@@ -144,14 +147,14 @@ void	*routine(void *arg)
 		if (check_death(philo) == -1)
 		{
 			print_status(philo, philo->index + 1, "died");
-			return (NULL);
+			break ;
 		}
 		take_forks(philo);
 		if (check_death(philo) == -1)
 		{
 			release_forks(philo);
 			print_status(philo, philo->index + 1, "died");
-			return (NULL);
+			break ;
 		}
 		print_status(philo, philo->index + 1, "is eating");
 		precise_sleep(philo->data->eat * 1000, philo);
@@ -163,12 +166,12 @@ void	*routine(void *arg)
 		if (philo->data->nb_eat != -1 && philo->ate >= philo->data->nb_eat)
 		{
 			print_status(philo, philo->index + 1, "is thinking");
-			return (NULL);
+			break ;
 		}
 		if (check_death(philo) == -1)
 		{
 			print_status(philo, philo->index + 1, "died");
-			return (NULL);
+			break ;
 		}
 		print_status(philo, philo->index + 1, "is sleeping");
 		precise_sleep(philo->data->sleep * 1000, philo);
