@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/04 16:03:44 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/05 17:48:15 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ void	*routine(void *arg)
 	philo = (t_philo *)arg;
 	print_status(philo, philo->index + 1, "is thinking");
 	if (philo->index % 2 != 0)
-		usleep(100);
+		usleep(philo->data->eat);
 	while (1)
 	{
 		if (check_death(philo) == -1)
@@ -157,15 +157,15 @@ void	*routine(void *arg)
 			break ;
 		}
 		print_status(philo, philo->index + 1, "is eating");
-		precise_sleep(philo->data->eat * 1000, philo);
-		pthread_mutex_lock(&philo->mutex);
+		// pthread_mutex_lock(&philo->mutex);
 		philo->ate++;
 		philo->last_ate = get_time() - philo->data->start;
-		pthread_mutex_unlock(&philo->mutex);
+		// pthread_mutex_unlock(&philo->mutex);
+		precise_sleep(philo->data->eat * 1000, philo);
 		release_forks(philo);
 		if (philo->data->nb_eat != -1 && philo->ate >= philo->data->nb_eat)
 		{
-			print_status(philo, philo->index + 1, "is thinking");
+			// print_status(philo, philo->index + 1, "is thinking");
 			break ;
 		}
 		if (check_death(philo) == -1)
@@ -175,6 +175,7 @@ void	*routine(void *arg)
 		}
 		print_status(philo, philo->index + 1, "is sleeping");
 		precise_sleep(philo->data->sleep * 1000, philo);
+		print_status(philo, philo->index + 1, "is thinking");
 	}
 	return (NULL);
 }
