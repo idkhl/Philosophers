@@ -6,11 +6,11 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/09 17:12:38 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/09 18:01:27 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/philo.h"
+#include "../includes/philo.h"
 
 long	ft_atol(char *str)
 {
