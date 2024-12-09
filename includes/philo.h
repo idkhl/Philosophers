@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:33 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/04 16:01:31 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/09 16:55:49 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <unistd.h>
 # include <pthread.h>
 # include <sys/time.h>
+# include <limits.h>
 
 typedef struct s_data
 {
@@ -43,11 +44,19 @@ typedef struct s_philo
 	t_data			*data;
 }	t_philo;
 
-/* UTIILS */
+void		*routine(void *arg);
+void		print_status(t_philo *philo, int philo_id, char *status);
+int			check_death(t_philo *philo);
+void		print_status(t_philo *philo, int philo_id, char *status);
+void		precise_sleep(long sleep_duration, t_philo *philo);
+void		take_forks(t_philo *philo);
+void		release_forks(t_philo *philo);
 
-int			ft_atoi(const char *str);
+/* UTILS */
+
+long		ft_atol(char *str);
 long int	get_time(void);
 int			ft_strcmp(char *s1, char *s2);
-void	print_status(t_philo *philo, int philo_id, char *status);
+void		one_philo(t_philo *philo);
 
 #endif

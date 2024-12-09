@@ -6,39 +6,38 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/02 16:26:40 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/09 17:12:38 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/philo.h"
 
-int	ft_atoi(const char *str)
+long	ft_atol(char *str)
 {
-	int	i;
-	int	nb;
-	int	neg;
+	long long	nb;
+	int			neg;
 
-	i = 0;
 	nb = 0;
 	neg = 1;
-	while (str[i] == ' ' || (str[i] >= '\t' && str[i] <= '\r'))
-		i++;
-	if (str[i] == '-' || str[i] == '+')
+	if (!str)
+		return (0);
+	while (*str == ' ' || (*str >= '\t' && *str <= '\r'))
+		str++;
+	if (*str == '-' || *str == '+')
 	{
-		if (str[i] == '-')
+		if (*str == '-')
 			neg = -1;
-		i++;
+		str++;
 	}
-	while (str[i])
+	while (*str >= '0' && *str <= '9')
 	{
-		if (str[i] >= '0' && str[i] <= '9')
-		{
-			nb = (nb * 10) + (str[i] - 48);
-			i++;
-		}
-		else
+		nb = nb * 10 + (*str - '0');
+		str++;
+		if ((nb * neg) > INT_MAX || (nb * neg) < INT_MIN)
 			return (0);
 	}
+	if (*str)
+		return (0);
 	return (nb * neg);
 }
 
@@ -56,11 +55,17 @@ int	ft_strcmp(char *s1, char *s2)
 	return (s1[i] - s2[i]);
 }
 
-// long int	get_time(void)
-// {
-// 	struct timeval	tv;
+long int	get_time(void)
+{
+	struct timeval	tv;
 
-// 	gettimeofday(&tv, NULL);
-// 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-// }
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+}
 
+void	one_philo(t_philo *philo)
+{
+	print_status(philo, philo->index + 1, "has taken a fork");
+	usleep(philo->data->die * 1000);
+	print_status(philo, philo->index + 1, "died");
+}
