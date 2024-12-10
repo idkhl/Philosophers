@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/10 14:05:58 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/10 15:55:39 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ long	ft_atol(char *str)
 	{
 		nb = nb * 10 + (*str - '0');
 		str++;
-		if ((nb * neg) > INT_MAX || (nb * neg) < INT_MIN)
+		if ((nb * neg) > INT_MAX / 1000 || (nb * neg) < INT_MIN)
 			return (0);
 	}
 	if (*str)

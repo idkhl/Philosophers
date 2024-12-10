@@ -6,7 +6,7 @@
 #    By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 13:40:23 by idakhlao          #+#    #+#              #
-#    Updated: 2024/12/09 18:01:17 by idakhlao         ###   ########.fr        #
+#    Updated: 2024/12/10 16:36:06 by idakhlao         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ SRCS = 	src/main.c src/actions.c src/routine.c src/utils.c
 OBJS_DIR = .objects
 OBJS = $(addprefix $(OBJS_DIR)/, $(SRCS:.c=.o))
 
-CFLAGS = -Wall -Wextra -Werror -g3 -pthread
+CFLAGS = -Wall -Wextra -Werror -g
 CC = cc
 RM = rm -f
 
