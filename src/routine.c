@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 16:51:38 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/09 17:08:33 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/10 14:02:13 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,12 @@ void	sleep_and_think(t_philo *philo)
 	print_status(philo, philo->index + 1, "is sleeping");
 	precise_sleep(philo->data->sleep * 1000, philo);
 	print_status(philo, philo->index + 1, "is thinking");
-	if (philo->data->nb_philo % 2 != 0)
-		usleep(((philo->data->die - philo->data->sleep) / 2) * 1000);
+	// printf("TEST\n");
+	// if (philo->data->nb_philo % 2 == 0)
+	// {
+	// precise_sleep(((philo->data->die - philo->data->sleep) / 2) * 1000, philo);
+	precise_sleep(1000, philo);
+	// }
 }
 
 void	loop(t_philo *philo)
@@ -70,7 +74,7 @@ void	*routine(void *arg)
 	}
 	print_status(philo, philo->index + 1, "is thinking");
 	if (philo->index % 2 != 0)
-		usleep(philo->data->eat);
+		precise_sleep(philo->data->eat, philo);
 	loop(philo);
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/09 18:01:27 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/10 14:05:58 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ long int	get_time(void)
 void	one_philo(t_philo *philo)
 {
 	print_status(philo, philo->index + 1, "has taken a fork");
+	pthread_mutex_lock(&philo->data->forks[0]);
 	usleep(philo->data->die * 1000);
+	pthread_mutex_unlock(&philo->data->forks[0]);
 	print_status(philo, philo->index + 1, "died");
 }

@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   prout.c                                            :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/09 17:59:42 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/10 12:54:33 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void	init_structure(char **av, t_data *data)
+int	init_structure(char **av, t_data *data)
 {
 	int	i;
 
@@ -32,11 +32,12 @@ void	init_structure(char **av, t_data *data)
 	if (!data->forks)
 	{
 		printf("Error: malloc failed\n");
-		exit(1);
+		return (-1);
 	}
 	i = 0;
 	while (i < data->nb_philo)
 		pthread_mutex_init(&data->forks[i++], NULL);
+	return (0);
 }
 
 void	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
@@ -111,7 +112,8 @@ int	main(int ac, char **av)
 
 	if (parsing(ac, av) == -1)
 		return (printf("Error\n"), 0);
-	init_structure(av, &data);
+	if (init_structure(av, &data) == -1)
+		return (0);
 	init_thread(&data);
 	return (0);
 }

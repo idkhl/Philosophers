@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 16:49:37 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/09 16:51:00 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/10 13:50:35 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ void	precise_sleep(long sleep_duration, t_philo *philo)
 	start_time = get_time();
 	while ((get_time() - start_time) * 1000 < sleep_duration)
 	{
+		if (check_death(philo) == -1)
+			break ;
 		pthread_mutex_lock(&philo->data->mutex_alive);
 		if (philo->data->is_alive == 0)
 		{
