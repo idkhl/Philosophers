@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/10 16:23:34 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/10 16:45:44 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	init_structure(char **av, t_data *data)
 	return (0);
 }
 
-void	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
+int	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
 {
 	int	i;
 
@@ -57,9 +57,10 @@ void	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
 			printf("Error: pthread_create failed\n");
 			while (--i >= 0)
 				pthread_join(thread[i], NULL);
-			return (free(data->forks), free(thread), free(philo));
+			return (free(data->forks), free(thread), free(philo), -1);
 		}
 	}
+	return (0);
 }
 
 void	init_thread(t_data *data)
@@ -74,7 +75,8 @@ void	init_thread(t_data *data)
 	philo = malloc(sizeof(t_philo) * data->nb_philo);
 	if (!philo)
 		return (free(thread), free(data->forks));
-	create_threads(data, philo, thread);
+	if (create_threads(data, philo, thread) == -1)
+		return ;
 	i = -1;
 	while (++i < data->nb_philo)
 		pthread_join(thread[i], NULL);
