@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/10 16:45:44 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/11 15:55:09 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
 				pthread_join(thread[i], NULL);
 			return (free(data->forks), free(thread), free(philo), -1);
 		}
+		usleep(10);
 	}
 	return (0);
 }

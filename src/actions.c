@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 16:49:37 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/10 15:50:38 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/11 15:52:48 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@ int	check_death(t_philo *philo)
 	{
 		pthread_mutex_lock(&philo->data->mutex_alive);
 		philo->data->is_alive = 0;
-		printf("%ld %d died\n", current_time, philo->index + 1);
 		pthread_mutex_unlock(&philo->data->mutex_alive);
+		pthread_mutex_lock(&philo->data->print_mutex);
+		printf("%ld %d died\n", current_time, philo->index + 1);
+		pthread_mutex_unlock(&philo->data->print_mutex);
 		return (-1);
 	}
 	return (0);
@@ -40,10 +42,12 @@ void	print_status(t_philo *philo, int philo_id, char *status)
 	long	time;
 
 	time = get_time() - philo->data->start;
-	pthread_mutex_lock(&philo->data->print_mutex);
 	if (check_death(philo) == 0)
+	{
+		pthread_mutex_lock(&philo->data->print_mutex);
 		printf("%ld %d %s\n", time, philo_id, status);
-	pthread_mutex_unlock(&philo->data->print_mutex);
+		pthread_mutex_unlock(&philo->data->print_mutex);
+	}
 }
 
 void	precise_sleep(long sleep_duration, t_philo *philo)
@@ -75,7 +79,7 @@ void	take_forks(t_philo *philo)
 
 	left_fork = philo->index;
 	right_fork = (philo->index + 1) % philo->data->nb_philo;
-	if (philo->index % 2 == 0)
+	if (philo->index % 2 == 0 && philo->index != philo->data->nb_philo - 1)
 	{
 		pthread_mutex_lock(&philo->data->forks[left_fork]);
 		print_status(philo, philo->index + 1, "has taken a fork");
