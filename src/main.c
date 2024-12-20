@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:37:19 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/11 15:55:09 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/13 10:12:24 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ int	init_structure(char **av, t_data *data)
 	return (0);
 }
 
-int	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
+int	create_threads(t_data *data, t_philo *philo, pthread_t *thread, \
+	pthread_t *monitor)
 {
 	int	i;
 
@@ -59,7 +60,11 @@ int	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
 				pthread_join(thread[i], NULL);
 			return (free(data->forks), free(thread), free(philo), -1);
 		}
-		usleep(10);
+	}
+	if (pthread_create(monitor, NULL, monitor_philosophers, data) != 0)
+	{
+		printf("Error: pthread_create for monitor failed\n");
+		return (free(data->forks), free(thread), free(philo), -1);
 	}
 	return (0);
 }
@@ -67,6 +72,7 @@ int	create_threads(t_data *data, t_philo *philo, pthread_t *thread)
 void	init_thread(t_data *data)
 {
 	pthread_t		*thread;
+	pthread_t		monitor;
 	t_philo			*philo;
 	int				i;
 
@@ -76,19 +82,16 @@ void	init_thread(t_data *data)
 	philo = malloc(sizeof(t_philo) * data->nb_philo);
 	if (!philo)
 		return (free(thread), free(data->forks));
-	if (create_threads(data, philo, thread) == -1)
+	data->philo = philo;
+	i = 0;
+	while (i < data->nb_philo)
+		pthread_mutex_init(&philo[i++].last_ate_mutex, NULL);
+	if (create_threads(data, philo, thread, &monitor) == -1)
 		return ;
 	i = -1;
 	while (++i < data->nb_philo)
 		pthread_join(thread[i], NULL);
-	i = -1;
-	while (++i < data->nb_philo)
-	{
-		pthread_mutex_destroy(&philo[i].mutex);
-		pthread_mutex_destroy(&data->forks[i]);
-	}
-	pthread_mutex_destroy(&data->print_mutex);
-	pthread_mutex_destroy(&data->mutex_alive);
+	pthread_join(monitor, NULL);
 	return (free(thread), free(philo), free(data->forks));
 }
 

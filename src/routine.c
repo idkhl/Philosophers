@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 16:51:38 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/10 16:39:58 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/17 12:19:48 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,25 @@ void	eat(t_philo *philo)
 		return ;
 	}
 	print_status(philo, philo->index + 1, "is eating");
-	philo->ate++;
+	pthread_mutex_lock(&philo->last_ate_mutex);
 	philo->last_ate = get_time() - philo->data->start;
+	philo->ate++;
+	pthread_mutex_unlock(&philo->last_ate_mutex);
 	precise_sleep(philo->data->eat * 1000, philo);
 	release_forks(philo);
+}
+
+void	is_thinking(t_philo *philo)
+{
+	long	current_time;
+	long	time_remaining;
+
+	current_time = get_time() - philo->data->start;
+	pthread_mutex_lock(&philo->last_ate_mutex);
+	time_remaining = philo->data->die - (current_time - philo->last_ate);
+	pthread_mutex_unlock(&philo->last_ate_mutex);
+	if (time_remaining > 0)
+		precise_sleep((time_remaining / 2) * 1000, philo);
 }
 
 void	sleep_and_think(t_philo *philo)
@@ -33,7 +48,7 @@ void	sleep_and_think(t_philo *philo)
 	print_status(philo, philo->index + 1, "is sleeping");
 	precise_sleep(philo->data->sleep * 1000, philo);
 	print_status(philo, philo->index + 1, "is thinking");
-	precise_sleep(1000, philo);
+	is_thinking(philo);
 }
 
 void	loop(t_philo *philo)

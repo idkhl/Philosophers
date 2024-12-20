@@ -6,7 +6,7 @@
 /*   By: idakhlao <idakhlao@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:11:29 by idakhlao          #+#    #+#             */
-/*   Updated: 2024/12/10 15:55:39 by idakhlao         ###   ########.fr       */
+/*   Updated: 2024/12/12 19:02:50 by idakhlao         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,5 +69,19 @@ void	one_philo(t_philo *philo)
 	pthread_mutex_lock(&philo->data->forks[0]);
 	usleep(philo->data->die * 1000);
 	pthread_mutex_unlock(&philo->data->forks[0]);
-	print_status(philo, philo->index + 1, "died");
+}
+
+void	destroy_mutexes(t_data *data, t_philo *philo)
+{
+	int	i;
+
+	i = -1;
+	while (++i < data->nb_philo)
+	{
+		pthread_mutex_destroy(&philo[i].mutex);
+		pthread_mutex_destroy(&philo[i].last_ate_mutex);
+		pthread_mutex_destroy(&data->forks[i]);
+	}
+	pthread_mutex_destroy(&data->print_mutex);
+	pthread_mutex_destroy(&data->mutex_alive);
 }
